@@ -7,14 +7,15 @@ from tika import parser
 import pandas as pd
 
 re_date = re.compile(r'^[ ]*Stan danych.*w dniu ([0-9.]+)( )?r.')
-re_field = re.compile(r'.*(liczba [^/:]*).*:')
+re_field = re.compile(r'^.*(liczba [^/:]*).*')
 re_num = re.compile(r'[^0-9]*([0-9]+).*')
 
 fix = {
     'liczba osób aktualnie hospitalizowanych z powodu podejrzenia zakażenia COVID-19': 'liczba osób hospitalizowanych z powodu podejrzenia zakażenia COVID-19',
     'liczba osób objętych aktualnie nadzorem epidemiologicznym': 'liczba osób aktualnie objętych nadzorem epidemiologicznym',
     'liczba zgonów w związku z zakażeniem COVID-19': 'liczba zgonów związanych z COVID-19',
-    'liczba zgonów powiązanych z COVID-19': 'liczba zgonów związanych z COVID-19'}
+    'liczba zgonów powiązanych z COVID-19': 'liczba zgonów związanych z COVID-19',
+    'liczba osób objętych aktualnie kwarantanną domową na podstawie decyzji inspektora': 'liczba osób aktualnie objętych kwarantanną domową'}
 
 if __name__ == '__main__':
     pdfdir = Path('pdf')
@@ -41,8 +42,10 @@ if __name__ == '__main__':
                     if k not in data:
                         data[k] = []
 
-                    v = line[line.find(':') + 1:].strip()
-                    if v:
+                    pos = line.find(':')
+                    if pos > 0:
+                        v = line[pos + 1:].strip()
+                    if pos > 0 and v:
                         res[k] = int(re_num.match(v).group(1))
                     else:
                         v = ' '.join(lines[ln + 1:ln + 3]).strip()
