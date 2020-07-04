@@ -5,9 +5,8 @@ from time import strptime, mktime
 
 from tika import parser
 import pandas as pd
-
 re_date = re.compile(r'^[ ]*Stan danych.*w dniu ([0-9.]+)( )?r.')
-re_field = re.compile(r'^.*(liczba [^/:]*).*')
+re_field = re.compile(r'^[•].*(liczba [^/:]*).*')
 re_num = re.compile(r'[^0-9]*([0-9]+).*')
 
 fix = {
