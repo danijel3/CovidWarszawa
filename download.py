@@ -3,28 +3,36 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import urlretrieve
 
+
+def fnames(d: datetime):
+    return [f'KORONAWIRUS-komunikat-PPIS-{d.strftime("%Y-%m-%d")}.pdf',
+            f'KORONAWIRUS-Komunikat-PPIS-{d.strftime("%Y-%m-%d")}.pdf',
+            f'KORONAWIRUS-komunikat-PPIS-{d.strftime("%Y-%m-%d")}-.pdf',
+            f'KORONAWIRUS-komunikat-PPIS-{d.strftime("%Y-%m-%d")}-k.pdf',
+            f'KORONAWIRUS-komunikat-PPIS--{d.strftime("%Y-%m-%d")}.pdf']
+
+
 if __name__ == '__main__':
 
     outdir = Path('pdf')
     today = datetime.today()
     d = datetime(2020, 3, 15)
     while d < today:
-        fname = f'KORONAWIRUS-komunikat-PPIS-{d.strftime("%Y-%m-%d")}.pdf'
-        fname2 = f'KORONAWIRUS-Komunikat-PPIS-{d.strftime("%Y-%m-%d")}.pdf'
-        outfile = outdir / fname
-        outfile2 = outdir / fname2
-        if outfile.exists() or outfile2.exists():
-            d += timedelta(days=1)
-            continue
-        url = f'https://www.pssewawa.pl/download/{fname}'
-        print(f'Downloading {url}...')
-        try:
-            urlretrieve(url, str(outfile))
-        except HTTPError:
-            url = f'https://www.pssewawa.pl/download/{fname2}'
+        found = False
+        for fname in fnames(d):
+            outfile = outdir / fname
+            if outfile.exists():
+                found = True
+                break
+            url = f'https://www.pssewawa.pl/download/{fname}'
             try:
-                urlretrieve(url, str(outfile2))
+                urlretrieve(url, str(outfile))
+                print(f'Downloaded {url}...')
+                found = True
+                break
             except HTTPError:
-                with open(str(outfile), 'w'):
-                    pass
+                continue
+        if not found:
+            with open(str(outdir / fnames(d)[0]), 'w'):
+                pass
         d += timedelta(days=1)
