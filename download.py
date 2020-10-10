@@ -24,14 +24,17 @@ if __name__ == '__main__':
             if outfile.exists():
                 found = True
                 break
-            url = f'https://www.pssewawa.pl/download/{fname}'
-            try:
-                urlretrieve(url, str(outfile))
-                print(f'Downloaded {url}...')
-                found = True
-                break
-            except HTTPError:
-                continue
+        if not found:
+            for fname in fnames(d):
+                outfile = outdir / fname
+                url = f'https://www.pssewawa.pl/download/{fname}'
+                try:
+                    urlretrieve(url, str(outfile))
+                    print(f'Downloaded {url}...')
+                    found = True
+                    break
+                except HTTPError:
+                    continue
         if not found:
             with open(str(outdir / fnames(d)[0]), 'w'):
                 pass
